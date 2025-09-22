@@ -1,67 +1,82 @@
-//import express library
 const express = require('express');
+const nodemailer = require('nodemailer');
+const cors = require('cors');
+require('dotenv').config(); // Carga las variables de entorno
 
-//create an instance of express
 const app = express();
-//port on which the server will run
-const PORT = 3000;
+const port = process.env.PORT || 3000;
 
-app.use(express.json());
+// Middlewares
+app.use(cors()); // Permite requests desde tu frontend
+app.use(express.json()); // Para poder leer el body JSON
 
-app.post('/plugin-tutorial', (req, res) => {
+// ENDPOINT para enviar WhatsApp con informacion
+app.post('/api/transferir-whatsapp', (req, res) => {
     //get info from the json sent in the request
     const {
-        name,
-        age,
-        phone_number
+        nombre,
+        numero_contacto,
+        cabello_resumen,
+        tratamiento
     } = req.body;
 
-    /*You can do some process here
-        Like check data on a database
-        Check user info
-        Send email
-        Add row to gsheets or mysql database
-    */
-    //output format
-    /*
-        Plugin endpoints should always return info with this template:
-        {
-            //raw parameter can have a json of general info about the result
-            raw: {
-                success: true,
-                client_name: name,
-                client_age: age,
-                result: "The user was added to the database successfully"
-            },
-            //type is the type of info you're gonna return, this can be either "markdown" (string data that can be rendered with gpt-ish markdown like |...|...| for tables) or "chart" (graph data, like piecharts, bar-charts)
-            type: "markdown"
-            //markdown parameter is the info that you're gonna return in the markdown format, this has to be with the typical markdown of chatgpt |...|...|. For now we leave it like "..." as we do not want to render info with a certain format
-            markdown: "...",
-            //desc is a string of plain text that is gonna be shown on the chat, this can also have a markdown for example bold letter with **[text]**, lists 1.[text] 2.[text] 3.[text]
-            "desc": "Se registro correctamente "
+    // Número del negocio o asesor de WhatsApp (ejemplo: +52 55 2637 3003)
+    const numeroDestino = "525523767744"; 
 
-        }
-    */
+    // Mensaje que irá en el WhatsApp (se encodea para que funcione bien en el link)
+    const mensaje = encodeURIComponent(
+        `👤 Nombre: ${nombre}\n📞 Contacto: ${numero_contacto}\n💇‍♀️ Resumen Cabello: ${cabello_resumen}\n✨ Tratamiento: ${tratamiento}\n\nQuiero agendar mi cita, por favor.`
+    );
+
+    // Generar link
+    const enlaceWhatsApp = `https://wa.me/${numeroDestino}?text=${mensaje}`;
 
     res.json({
         raw: {
             success: true,
-            client_name: name,
-            client_age: age,
-            result: "The user was added to the database successfully"
+            client_name: nombre,
+            client_treatment: tratamiento,
+            result: "Se le envió correctamente el enlace al WhatsApp para agendar cita"
         },
-        markdown: "...",
+        markdown: `[📲 Enlace directo a WhatsApp](${enlaceWhatsApp})`,
         type: "markdown",
-        desc: `Se registro correctamente a *${name}*, con numero de contacto *${phone_number}* y edad ${age}`
+        desc: `Aquí tienes el enlace para continuar en WhatsApp y confirmar la cita: \n\n${enlaceWhatsApp}`
     });
-})
+});
 
-//initialize server with app.listen method, if there are no errors when initializing
-//the server then it will print succesfully in the console, if not then print error
-app.listen(PORT, (error) => {
-    if (!error)
-        console.log(`Server running on http://localhost:${PORT}`);
-    else
-        console.log("Error occurred, server can't start", error);
-}
-);
+app.post('/api/send-whatsapp', (req, res) => {
+    //get info from the json sent in the request
+    const {
+        nombre,
+        numero_contacto,
+        cabello_resumen,
+        tratamiento
+    } = req.body;
+
+    // Número del negocio o asesor de WhatsApp (ejemplo: +52 55 2637 3003)
+    const numeroDestino = "525523767744"; 
+
+    // Mensaje que irá en el WhatsApp (se encodea para que funcione bien en el link)
+    const mensaje = encodeURIComponent(
+        `👤 Nombre: ${nombre}\n📞 Contacto: ${numero_contacto}\n💇‍♀️ Resumen Cabello: ${cabello_resumen}\n✨ Tratamiento: ${tratamiento}\n\nQuiero agendar mi cita, por favor.`
+    );
+
+    // Generar link
+    const enlaceWhatsApp = `https://wa.me/${numeroDestino}?text=${mensaje}`;
+
+    res.json({
+        raw: {
+            success: true,
+            client_name: nombre,
+            client_treatment: tratamiento,
+            result: "Se le envió correctamente el enlace al WhatsApp para agendar cita"
+        },
+        markdown: `[📲 Enlace directo a WhatsApp](${enlaceWhatsApp})`,
+        type: "markdown",
+        desc: `Aquí tienes el enlace para continuar en WhatsApp y confirmar la cita: \n\n${enlaceWhatsApp}`
+    });
+});
+
+app.listen(port, () => {
+  console.log(`Servidor escuchando en http://localhost:${port}`);
+});
