@@ -59,7 +59,7 @@ app.post('/api/transferir-whatsapp', async (req, res) => {
     const enlaceLargoWhatsApp = `https://wa.me/${numeroDestino}?text=${mensaje}`;
 
     // Segundo, llama a la función para acortar el enlace
-    const enlaceCortoWhatsApp = await acortarEnlace(enlaceLargoWhatsApp);
+    //const enlaceCortoWhatsApp = await acortarEnlace(enlaceLargoWhatsApp);
 
     // --- RESPUESTA PARA LA CLIENTA (MÁS ATRACTIVA) ---
     res.json({
@@ -70,11 +70,11 @@ app.post('/api/transferir-whatsapp', async (req, res) => {
             result: "Enlace de WhatsApp corto generado para agendar la cita."
         },
         // El markdown lo dejamos por si en el futuro se usa en una plataforma que sí lo soporte
-        markdown: `[💬 ¡Sí, quiero agendar mi cita por WhatsApp!](${enlaceCortoWhatsApp})`,
+        markdown: `[💬 ¡Sí, quiero agendar mi cita por WhatsApp!](${enlaceLargoWhatsApp})`,
         type: "markdown",
         // Esta es la parte clave: ahora el enlace que ve el usuario es corto y limpio
         desc: `¡Perfecto, ${nombre}! ✨ Estás a un solo paso de comenzar tu transformación.\n\n` +
-            `Haz clic aquí para confirmar tu cita por WhatsApp: ${enlaceCortoWhatsApp}`
+            `Haz clic aquí para confirmar tu cita por WhatsApp: ${enlaceLargoWhatsApp}`
     });
 });
 
