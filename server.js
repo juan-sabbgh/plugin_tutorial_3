@@ -16,7 +16,7 @@ app.post('/api/transferir-whatsapp', (req, res) => {
     const {
         nombre,
         numero_contacto,
-        resumen_cabello_cliente,
+        cabello_resumen,
         tratamiento
     } = req.body;
 
@@ -30,7 +30,7 @@ app.post('/api/transferir-whatsapp', (req, res) => {
         `---------------------------\n` +
         `👤 *Nombre:* ${nombre}\n` +
         `📞 *Contacto:* ${numero_contacto}\n` +
-        `✍️ *Resumen de mi cabello:* ${resumen_cabello_cliente}\n` +
+        `✍️ *Resumen de mi cabello:* ${cabello_resumen}\n` +
         `🌿 *Tratamiento de interés:* ${tratamiento}\n` +
         `---------------------------\n\n` +
         `¡Quedo atenta para confirmar los detalles! ✨`
