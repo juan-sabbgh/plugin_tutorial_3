@@ -10,8 +10,27 @@ const port = process.env.PORT || 3000;
 app.use(cors()); // Permite requests desde tu frontend
 app.use(express.json()); // Para poder leer el body JSON
 
+// Agregamos esta función para acortar la URL
+async function acortarEnlace(urlLarga) {
+    // Usamos un bloque try...catch para manejar cualquier error con el servicio externo
+    try {
+        const response = await fetch(`https://tinyurl.com/api-create.php?url=${encodeURIComponent(urlLarga)}`);
+        if (response.ok) {
+            const urlCorta = await response.text();
+            return urlCorta;
+        }
+        // Si el servicio falla, devolvemos la URL original para no romper el flujo
+        return urlLarga;
+    } catch (error) {
+        console.error("Error al acortar el enlace:", error);
+        // En caso de error, devolvemos la URL original
+        return urlLarga;
+    }
+}
+
+
 // ENDPOINT para enviar WhatsApp con informacion
-app.post('/api/transferir-whatsapp', (req, res) => {
+app.post('/api/transferir-whatsapp', async (req, res) => {
     //get info from the json sent in the request
     const {
         nombre,
@@ -37,7 +56,10 @@ app.post('/api/transferir-whatsapp', (req, res) => {
     );
 
     // Generar link
-    const enlaceWhatsApp = `https://wa.me/${numeroDestino}?text=${mensaje}`;
+    const enlaceLargoWhatsApp = `https://wa.me/${numeroDestino}?text=${mensaje}`;
+
+    // Segundo, llama a la función para acortar el enlace
+    const enlaceCortoWhatsApp = await acortarEnlace(enlaceLargoWhatsApp);
 
     // --- RESPUESTA PARA LA CLIENTA (MÁS ATRACTIVA) ---
     res.json({
@@ -45,12 +67,14 @@ app.post('/api/transferir-whatsapp', (req, res) => {
             success: true,
             client_name: nombre,
             client_treatment: tratamiento,
-            result: "Enlace de WhatsApp generado para agendar la cita."
+            result: "Enlace de WhatsApp corto generado para agendar la cita."
         },
-        markdown: `[💬 ¡Sí, quiero agendar mi cita por WhatsApp!](${enlaceWhatsApp})`,
+        // El markdown lo dejamos por si en el futuro se usa en una plataforma que sí lo soporte
+        markdown: `[💬 ¡Sí, quiero agendar mi cita por WhatsApp!](${enlaceCortoWhatsApp})`,
         type: "markdown",
+        // Esta es la parte clave: ahora el enlace que ve el usuario es corto y limpio
         desc: `¡Perfecto, ${nombre}! ✨ Estás a un solo paso de comenzar tu transformación.\n\n` +
-            `Haz clic en el enlace para enviar tu solicitud a nuestra anfitriona por WhatsApp. Ella te atenderá con mucho cariño para confirmar el día, la hora y los detalles del pago. 💖`
+            `Haz clic aquí para confirmar tu cita por WhatsApp: ${enlaceCortoWhatsApp}`
     });
 });
 
