@@ -16,31 +16,41 @@ app.post('/api/transferir-whatsapp', (req, res) => {
     const {
         nombre,
         numero_contacto,
-        cabello_resumen,
+        resumen_cabello_cliente,
         tratamiento
     } = req.body;
 
     // Número del negocio o asesor de WhatsApp (ejemplo: +52 55 2637 3003)
-    const numeroDestino = "525523767744"; 
+    const numeroDestino = "525523767744";
 
-    // Mensaje que irá en el WhatsApp (se encodea para que funcione bien en el link)
+    // --- MENSAJE PARA LA HOST (MÁS CONTEXTO Y CALIDEZ) ---
     const mensaje = encodeURIComponent(
-        `👤 Nombre: ${nombre}\n📞 Contacto: ${numero_contacto}\n💇‍♀️ Resumen Cabello: ${cabello_resumen}\n✨ Tratamiento: ${tratamiento}\n\nQuiero agendar mi cita, por favor.`
+        `¡Hola! 👋 Vengo de KeerAI y me gustaría agendar mi cita. ¡Estoy muy emocionada por empezar mi tratamiento! 💖\n\n` +
+        `Aquí están mis datos:\n` +
+        `---------------------------\n` +
+        `👤 *Nombre:* ${nombre}\n` +
+        `📞 *Contacto:* ${numero_contacto}\n` +
+        `✍️ *Resumen de mi cabello:* ${resumen_cabello_cliente}\n` +
+        `🌿 *Tratamiento de interés:* ${tratamiento}\n` +
+        `---------------------------\n\n` +
+        `¡Quedo atenta para confirmar los detalles! ✨`
     );
 
     // Generar link
     const enlaceWhatsApp = `https://wa.me/${numeroDestino}?text=${mensaje}`;
 
+    // --- RESPUESTA PARA LA CLIENTA (MÁS ATRACTIVA) ---
     res.json({
         raw: {
             success: true,
             client_name: nombre,
             client_treatment: tratamiento,
-            result: "Se le envió correctamente el enlace al WhatsApp para agendar cita"
+            result: "Enlace de WhatsApp generado para agendar la cita."
         },
-        markdown: `[📲 Enlace directo a WhatsApp](${enlaceWhatsApp})`,
+        markdown: `[💬 ¡Sí, quiero agendar mi cita por WhatsApp!](${enlaceWhatsApp})`,
         type: "markdown",
-        desc: `Aquí tienes el enlace para continuar en WhatsApp y confirmar la cita: \n\n${enlaceWhatsApp}`
+        desc: `¡Perfecto, ${nombre}! ✨ Estás a un solo paso de comenzar tu transformación.\n\n` +
+            `Haz clic en el enlace para enviar tu solicitud a nuestra anfitriona por WhatsApp. Ella te atenderá con mucho cariño para confirmar el día, la hora y los detalles del pago. 💖`
     });
 });
 
@@ -54,7 +64,7 @@ app.post('/api/send-whatsapp', (req, res) => {
     } = req.body;
 
     // Número del negocio o asesor de WhatsApp (ejemplo: +52 55 2637 3003)
-    const numeroDestino = "525523767744"; 
+    const numeroDestino = "525523767744";
 
     // Mensaje que irá en el WhatsApp (se encodea para que funcione bien en el link)
     const mensaje = encodeURIComponent(
@@ -78,5 +88,5 @@ app.post('/api/send-whatsapp', (req, res) => {
 });
 
 app.listen(port, () => {
-  console.log(`Servidor escuchando en http://localhost:${port}`);
+    console.log(`Servidor escuchando en http://localhost:${port}`);
 });
