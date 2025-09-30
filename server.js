@@ -119,7 +119,7 @@ app.post('/api/transferir-whatsapp', async (req, res) => {
     });
 });
 
-app.post('/transferir-whatsapp-new', async (req, res) => {
+app.post('/api/transferir-whatsapp-new', async (req, res) => {
     //get info from the json sent in the request
     const {
         nombre,
