@@ -14,6 +14,38 @@ const AGENT_TOKEN = process.env.AGENT_TOKEN;
 const AGENT_KEY = process.env.AGENT_KEY;
 const AS_ACCOUNT = process.env.AS_ACCOUNT;
 
+
+async function acortarEnlace(urlLarga) {
+    // La URL de la API de TinyURL es simple: se le pasa la URL a acortar como parámetro.
+    const apiUrl = `https://tinyurl.com/api-create.php?url=${encodeURIComponent(urlLarga)}`;
+
+    try {
+        console.log("Intentando acortar el enlace:", urlLarga);
+        const response = await fetch(apiUrl);
+
+        // Si la respuesta no es exitosa (ej. status 400, 500), lanzamos un error.
+        if (!response.ok) {
+            throw new Error(`La API de TinyURL respondió con el estado: ${response.status}`);
+        }
+
+        const urlCorta = await response.text();
+
+        // La API de TinyURL a veces devuelve 'Error' en el texto si la URL es inválida.
+        if (urlCorta === "Error") {
+            throw new Error("TinyURL reportó un error con la URL proporcionada.");
+        }
+
+        console.log("Enlace acortado exitosamente:", urlCorta);
+        return urlCorta;
+
+    } catch (error) {
+        // Si cualquier parte del bloque 'try' falla, lo capturamos aquí.
+        console.error("Error al acortar con TinyURL. Se devolverá el enlace largo.", error.message);
+        // Devolvemos la URL original como respaldo.
+        return urlLarga;
+    }
+}
+
 async function getChatSummary(hair_data) {
     try {
         // Create a more informative prompt including the database results
@@ -99,6 +131,8 @@ app.post('/api/transferir-whatsapp', async (req, res) => {
     // Generar link
     const enlaceLargoWhatsApp = `https://wa.me/${numeroDestino}?text=${mensaje}`;
 
+    const enlaceFinalWhatsApp = await acortarEnlace(enlaceLargoWhatsApp);
+
     // Segundo, llama a la función para acortar el enlace
     //const enlaceCortoWhatsApp = await acortarEnlace(enlaceLargoWhatsApp);
 
@@ -108,14 +142,14 @@ app.post('/api/transferir-whatsapp', async (req, res) => {
             success: true,
             client_name: nombre,
             client_treatment: tratamiento,
-            result: "Enlace de WhatsApp corto generado para agendar la cita."
+            result: "Enlace de WhatsApp generado para agendar la cita."
         },
         // El markdown lo dejamos por si en el futuro se usa en una plataforma que sí lo soporte
-        markdown: `[💬 ¡Sí, quiero agendar mi cita por WhatsApp!](${enlaceLargoWhatsApp})`,
+        markdown: `[💬 ¡Sí, quiero agendar mi cita por WhatsApp!](${enlaceFinalWhatsApp})`,
         type: "markdown",
         // Esta es la parte clave: ahora el enlace que ve el usuario es corto y limpio
         desc: `¡Perfecto, ${nombre}! ✨ Estás a un solo paso de comenzar tu transformación.\n\n` +
-            `Haz clic aquí para confirmar tu cita por WhatsApp: ${enlaceLargoWhatsApp}`
+            `Haz clic aquí para confirmar tu cita por WhatsApp: ${enlaceFinalWhatsApp}`
     });
 });
 
@@ -166,7 +200,9 @@ app.post('/api/transferir-whatsapp-new', async (req, res) => {
     // Generar link
     const enlaceLargoWhatsApp = `https://wa.me/${numeroDestino}?text=${mensaje}`;
 
+
     // Segundo, llama a la función para acortar el enlace
+    const enlaceFinalWhatsApp = await acortarEnlace(enlaceLargoWhatsApp);
     //const enlaceCortoWhatsApp = await acortarEnlace(enlaceLargoWhatsApp);
 
     // --- RESPUESTA PARA LA CLIENTA (MÁS ATRACTIVA) ---
@@ -178,11 +214,11 @@ app.post('/api/transferir-whatsapp-new', async (req, res) => {
             result: "Enlace de WhatsApp corto generado para agendar la cita."
         },
         // El markdown lo dejamos por si en el futuro se usa en una plataforma que sí lo soporte
-        markdown: `[💬 ¡Sí, quiero agendar mi cita por WhatsApp!](${enlaceLargoWhatsApp})`,
+        markdown: `[💬 ¡Sí, quiero agendar mi cita por WhatsApp!](${enlaceFinalWhatsApp})`,
         type: "markdown",
         // Esta es la parte clave: ahora el enlace que ve el usuario es corto y limpio
         desc: `¡Perfecto, ${nombre}! ✨ Estás a un solo paso de comenzar tu transformación.\n\n` +
-            `Haz clic aquí para confirmar tu cita por WhatsApp: ${enlaceLargoWhatsApp}`
+            `Haz clic aquí para confirmar tu cita por WhatsApp: ${enlaceFinalWhatsApp}`
     });
 });
 
