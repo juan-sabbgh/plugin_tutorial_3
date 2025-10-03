@@ -207,12 +207,6 @@ app.post('/api/transferir-whatsapp-new', async (req, res) => {
 
     // --- RESPUESTA PARA LA CLIENTA (MÁS ATRACTIVA) ---
     res.json({
-        raw: {
-            success: true,
-            client_name: nombre,
-            client_treatment: tratamiento,
-            result: "Enlace de WhatsApp corto generado para agendar la cita."
-        },
         // El markdown lo dejamos por si en el futuro se usa en una plataforma que sí lo soporte
         markdown: `[💬 ¡Sí, quiero agendar mi cita por WhatsApp!](${enlaceFinalWhatsApp})`,
         type: "markdown",
