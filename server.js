@@ -216,6 +216,47 @@ app.post('/api/transferir-whatsapp-new', async (req, res) => {
     });
 });
 
+app.post('/api/transferir-whatsapp-browspot', async (req, res) => {
+    //get info from the json sent in the request
+    const {
+        nombre,
+        numero_contacto,
+        servicio
+    } = req.body;
+
+    // Número del negocio o asesor de WhatsApp (ejemplo: +52 55 2637 3003)
+    const numeroDestino = "525523767744";
+
+    // --- MENSAJE PARA LA HOST (MÁS CONTEXTO Y CALIDEZ) ---
+    const mensaje = encodeURIComponent(
+        `¡Hola! 👋 Vengo de Brow Bot y me gustaría agendar mi cita. ¡Estoy muy emocionada por empezar mi tratamiento! 💖\n\n` +
+        `Aquí están mis datos:\n` +
+        `---------------------------\n` +
+        `👤 *Nombre:* ${nombre}\n` +
+        `📞 *Contacto:* ${numero_contacto}\n` +
+        `🌿 *Tratamiento de interés:* ${servicio}\n` +
+        `---------------------------\n\n` +
+        `¡Quedo atenta para confirmar los detalles! ✨`
+    );
+
+    // Generar link
+    const enlaceLargoWhatsApp = `https://wa.me/${numeroDestino}?text=${mensaje}`;
+
+    // Segundo, llama a la función para acortar el enlace
+    const enlaceFinalWhatsApp = await acortarEnlace(enlaceLargoWhatsApp);
+    //const enlaceCortoWhatsApp = await acortarEnlace(enlaceLargoWhatsApp);
+
+    // --- RESPUESTA PARA LA CLIENTA (MÁS ATRACTIVA) ---
+    res.json({
+        // El markdown lo dejamos por si en el futuro se usa en una plataforma que sí lo soporte
+        markdown: `[💬 ¡Sí, quiero agendar mi cita por WhatsApp!](${enlaceFinalWhatsApp})`,
+        type: "markdown",
+        // Esta es la parte clave: ahora el enlace que ve el usuario es corto y limpio
+        desc: `¡Perfecto, ${nombre}! ✨ Estás a un solo paso de comenzar tu transformación.\n\n` +
+            `Haz clic aquí para confirmar tu cita por WhatsApp: ${enlaceFinalWhatsApp}`
+    });
+});
+
 
 app.post('/api/send-whatsapp', (req, res) => {
     //get info from the json sent in the request
