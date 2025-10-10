@@ -16,6 +16,49 @@ const AS_ACCOUNT = process.env.AS_ACCOUNT;
 
 const YCLOUD_API = process.env.YCLOUD_API;
 
+//database parameters
+const DB_HOST = process.env.DB_HOST;
+const DB_PORT = process.env.DB_PORT;
+const DB_PASSWORD = process.env.DB_PASSWORD;
+const DB_USER = process.env.DB_USER;
+const DB_NAME = process.env.DB_NAME;
+
+const dbConfig = {
+    host: DB_HOST,
+    port: DB_PORT,
+    user: DB_USER,
+    password: DB_PASSWORD,
+    database: DB_NAME,
+    ssl: {
+        rejectUnauthorized: false
+    }
+};
+
+// Crea un pool de conexiones usando la configuración
+const pool = new Pool(dbConfig);
+
+// Crea un pool de conexiones para manejar las consultas de forma eficiente
+//const pool = mysql.createPool(dbConfig);
+
+async function executeQuery(servicio) {
+    let connection;
+    try {
+        connection = await pool.getConnection(); 
+        const searchTerm = `%${servicio}%`;
+        //get link for that service
+        const results = await pool.query("SELECT link FROM iimages_browspot WHERE servicio ILIKE ?", [searchTerm]);
+        console.log(results.rows);
+        //return rows
+        return results.rows;
+    } catch (error) {
+        console.error("Error en la consulta SQL syntax:", error);
+        throw error;
+    } finally {
+        if (connection) {
+            connection.release();
+        }
+    }
+}
 
 async function acortarEnlace(urlLarga) {
     // La URL de la API de TinyURL es simple: se le pasa la URL a acortar como parámetro.
@@ -156,7 +199,7 @@ app.post('/api/transferir-whatsapp', async (req, res) => {
 });
 
 // Función asíncrona para poder usar 'await'
-async function enviarMensajeWhatsApp(number_receiver) {
+async function enviarMensajeWhatsApp(number_receiver, image_link) {
     const url = 'https://api.ycloud.com/v2/whatsapp/messages/sendDirectly';
 
     // 1. Define las cabeceras (headers) de la petición
@@ -170,7 +213,7 @@ async function enviarMensajeWhatsApp(number_receiver) {
     const body = {
         type: "image",
         image: {
-            link: "https://agents.dyna.ai/api/app/cybertron/knowledge_file/image/knowledge/file_section_img/89a4700bd23d48f8b3170d1ad472d482.png"
+            link: image_link
         },
         to: number_receiver,
         from: "+525579435037"
@@ -314,12 +357,12 @@ app.post('/api/return-image-browspot', async (req, res) => {
     } = req.body;
     //get phone number from the body
     const numero = function_call_username.split('--').pop();
-
+    console.log(`Se busca imagen para ${servicio}`)
     try {
         //look for image link in database for that service
-
+        const image_link = executeQuery(servicio);
         //Send image to phone number
-        await enviarMensajeWhatsApp(numero);
+        await enviarMensajeWhatsApp(numero, image_link);
 
         //return basic message like these are the results after getting the service xxxx
         return res.json({
