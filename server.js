@@ -14,6 +14,8 @@ const AGENT_TOKEN = process.env.AGENT_TOKEN;
 const AGENT_KEY = process.env.AGENT_KEY;
 const AS_ACCOUNT = process.env.AS_ACCOUNT;
 
+const YCLOUD_API = process.env.YCLOUD_API;
+
 
 async function acortarEnlace(urlLarga) {
     // La URL de la API de TinyURL es simple: se le pasa la URL a acortar como parámetro.
@@ -153,6 +155,53 @@ app.post('/api/transferir-whatsapp', async (req, res) => {
     });
 });
 
+// Función asíncrona para poder usar 'await'
+async function enviarMensajeWhatsApp(number_receiver) {
+    const url = 'https://api.ycloud.com/v2/whatsapp/messages/sendDirectly';
+
+    // 1. Define las cabeceras (headers) de la petición
+    const headers = {
+        'X-API-Key': YCLOUD_API,
+        'accept': 'application/json',
+        'Content-Type': 'application/json' // Es importante que el Content-Type sea correcto
+    };
+
+    // 2. Define el cuerpo (body) de la petición
+    const body = {
+        type: "image",
+        image: {
+            link: "https://agents.dyna.ai/api/app/cybertron/knowledge_file/image/knowledge/file_section_img/89a4700bd23d48f8b3170d1ad472d482.png"
+        },
+        to: number_receiver,
+        from: "+525579435037"
+    };
+
+    // 3. Realiza la petición POST usando fetch
+    try {
+        const response = await fetch(url, {
+            method: 'POST',
+            headers: headers,
+            body: JSON.stringify(body) // El cuerpo debe ser convertido a un string JSON
+        });
+
+        // Revisa si la petición fue exitosa (código de estado 200-299)
+        if (!response.ok) {
+            // Si hay un error, muestra el estado y el texto del error
+            const errorText = await response.text();
+            throw new Error(`Error HTTP ${response.status}: ${errorText}`);
+        }
+
+        // Convierte la respuesta a JSON
+        const data = await response.json();
+
+        console.log('✅ Éxito:', data);
+        return data;
+
+    } catch (error) {
+        console.error('❌ Error en la petición:', error);
+    }
+}
+
 app.post('/api/transferir-whatsapp-new', async (req, res) => {
     //get info from the json sent in the request
     const {
@@ -259,51 +308,34 @@ app.post('/api/transferir-whatsapp-browspot', async (req, res) => {
 
 app.post('/api/return-image-browspot', async (req, res) => {
     //get info from the json sent in the request
-    // 1. Imprimir las cabeceras (headers)
-    console.log('▶️ Headers:');
-    console.log(req.headers);
+    const {
+        servicio,
+        function_call_username
+    } = req.body;
+    //get phone number from the body
+    const numero = function_call_username.split('--').pop();
 
-    // 2. Imprimir los parámetros de la URL (query params)
-    // Ej: /mi-endpoint?nombre=juan&id=123
-    console.log('\n▶️ Query Params:');
-    console.log(req.query);
+    try {
+        //look for image link in database for that service
 
-    // 3. Imprimir el cuerpo de la petición (body)
-    console.log('\n▶️ Body:');
-    console.log(req.body);
+        //Send image to phone number
+        await enviarMensajeWhatsApp(numero);
 
-    //Easy tests
-    const imageUrl = 'https://agents.dyna.ai/api/app/cybertron/knowledge_file/image/knowledge/file_section_img/89a4700bd23d48f8b3170d1ad472d482.png/';
-
-    //try {
-
-    //Get the link request from the database with a SQL query
-    //const imageResponse = await fetch(imageUrl);
-    //make the request and get the results
-    //const contentType = imageResponse.headers.get('content-type');
-    //const imageBuffer = Buffer.from(await imageResponse.arrayBuffer());
-
-    //set content type
-    //res.setHeader('Content-Type', contentType);
-    return res.json({
-        markdown: imageUrl,
-        type: "markdown",
-        //return image hex in desc
-        desc: {
-            "type": "image",
-            "image": {
-                "link": "https://agents.dyna.ai/api/app/cybertron/knowledge_file/image/knowledge/file_section_img/89a4700bd23d48f8b3170d1ad472d482.png"
-            }
-        }
-    });
-    /*} catch (error) {
+        //return basic message like these are the results after getting the service xxxx
         return res.json({
-            markdown: `...`,
+            markdown: "...",
             type: "markdown",
-            //return image hex in desc
-            desc: `No se pudo encontrar una imagen para ese servicios`
+            desc: `Asi es como quedan los resultados al aplicarte ${servicio}`
         });
-    }*/
+    } catch (error) {
+        //Return error message as we couldnt find images for that service and to check the social media
+        return res.json({
+            markdown: "...",
+            type: "markdown",
+            desc: "No se encontraron imagenes para ese servicio, puedes revisar nuestras redes sociales @thebrowspotmx"
+        });
+    }
+
 });
 
 
