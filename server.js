@@ -41,9 +41,7 @@ const pool = new Pool(dbConfig);
 //const pool = mysql.createPool(dbConfig);
 
 async function executeQuery(servicio) {
-    let connection;
     try {
-        connection = await pool.getConnection(); 
         const searchTerm = `%${servicio}%`;
         //get link for that service
         const results = await pool.query("SELECT link FROM iimages_browspot WHERE servicio ILIKE ?", [searchTerm]);
@@ -53,10 +51,6 @@ async function executeQuery(servicio) {
     } catch (error) {
         console.error("Error en la consulta SQL syntax:", error);
         throw error;
-    } finally {
-        if (connection) {
-            connection.release();
-        }
     }
 }
 
