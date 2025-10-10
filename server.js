@@ -1,5 +1,5 @@
 const express = require('express');
-const nodemailer = require('nodemailer');
+const { Pool } = require('pg');
 const cors = require('cors');
 require('dotenv').config(); // Carga las variables de entorno
 
