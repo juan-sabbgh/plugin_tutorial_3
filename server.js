@@ -266,30 +266,30 @@ app.post('/api/return-image-browspot', async (req, res) => {
     //Easy tests
     const imageUrl = 'https://agents.dyna.ai/api/app/cybertron/knowledge_file/image/knowledge/file_section_img/89a4700bd23d48f8b3170d1ad472d482.png/';
 
-    try {
+    //try {
 
-        //Get the link request from the database with a SQL query
-        //const imageResponse = await fetch(imageUrl);
-        //make the request and get the results
-        //const contentType = imageResponse.headers.get('content-type');
-        //const imageBuffer = Buffer.from(await imageResponse.arrayBuffer());
+    //Get the link request from the database with a SQL query
+    //const imageResponse = await fetch(imageUrl);
+    //make the request and get the results
+    //const contentType = imageResponse.headers.get('content-type');
+    //const imageBuffer = Buffer.from(await imageResponse.arrayBuffer());
 
-        //set content type
-        res.setHeader('Content-Type', contentType);
-        return res.json({
-            markdown: `...`,
-            type: "markdown",
-            //return image hex in desc
-            desc: 'https://agents.dyna.ai/api/app/cybertron/knowledge_file/image/knowledge/file_section_img/89a4700bd23d48f8b3170d1ad472d482.png/'
-        });
-    } catch (error) {
+    //set content type
+    res.setHeader('Content-Type', contentType);
+    return res.json({
+        markdown: `...`,
+        type: "markdown",
+        //return image hex in desc
+        desc: imageUrl
+    });
+    /*} catch (error) {
         return res.json({
             markdown: `...`,
             type: "markdown",
             //return image hex in desc
             desc: `No se pudo encontrar una imagen para ese servicios`
         });
-    }
+    }*/
 });
 
 
