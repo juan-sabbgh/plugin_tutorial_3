@@ -277,7 +277,7 @@ app.post('/api/return-image-browspot', async (req, res) => {
     //set content type
     //res.setHeader('Content-Type', contentType);
     return res.json({
-        markdown: `...`,
+        markdown: imageUrl,
         type: "markdown",
         //return image hex in desc
         desc: imageUrl
