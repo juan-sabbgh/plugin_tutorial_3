@@ -275,7 +275,7 @@ app.post('/api/return-image-browspot', async (req, res) => {
     //const imageBuffer = Buffer.from(await imageResponse.arrayBuffer());
 
     //set content type
-    res.setHeader('Content-Type', contentType);
+    //res.setHeader('Content-Type', contentType);
     return res.json({
         markdown: `...`,
         type: "markdown",
