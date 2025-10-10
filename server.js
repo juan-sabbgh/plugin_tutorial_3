@@ -259,9 +259,18 @@ app.post('/api/transferir-whatsapp-browspot', async (req, res) => {
 
 app.post('/api/return-image-browspot', async (req, res) => {
     //get info from the json sent in the request
-    const {
-        servicio
-    } = req.body;
+    // 1. Imprimir las cabeceras (headers)
+    console.log('▶️ Headers:');
+    console.log(req.headers);
+
+    // 2. Imprimir los parámetros de la URL (query params)
+    // Ej: /mi-endpoint?nombre=juan&id=123
+    console.log('\n▶️ Query Params:');
+    console.log(req.query);
+
+    // 3. Imprimir el cuerpo de la petición (body)
+    console.log('\n▶️ Body:');
+    console.log(req.body);
 
     //Easy tests
     const imageUrl = 'https://agents.dyna.ai/api/app/cybertron/knowledge_file/image/knowledge/file_section_img/89a4700bd23d48f8b3170d1ad472d482.png/';
@@ -280,7 +289,12 @@ app.post('/api/return-image-browspot', async (req, res) => {
         markdown: imageUrl,
         type: "markdown",
         //return image hex in desc
-        desc: imageUrl
+        desc: {
+            "type": "image",
+            "image": {
+                "link": "https://agents.dyna.ai/api/app/cybertron/knowledge_file/image/knowledge/file_section_img/89a4700bd23d48f8b3170d1ad472d482.png"
+            }
+        }
     });
     /*} catch (error) {
         return res.json({
