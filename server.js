@@ -44,7 +44,7 @@ async function executeQuery(servicio) {
     try {
         const searchTerm = `%${servicio}%`;
         //get link for that service
-        const results = await pool.query("SELECT link FROM iimages_browspot WHERE servicio ILIKE ?", [searchTerm]);
+        const results = await pool.query("SELECT link FROM iimages_browspot WHERE servicio ILIKE $1", [searchTerm]);
         console.log(results.rows);
         //return rows
         return results.rows;
@@ -351,10 +351,22 @@ app.post('/api/return-image-browspot', async (req, res) => {
     } = req.body;
     //get phone number from the body
     const numero = function_call_username.split('--').pop();
-    console.log(`Se busca imagen para ${servicio}`)
+    console.log(`Se busca imagen para ${servicio} y se manda al numero: ${numero}`)
     try {
         //look for image link in database for that service
-        const image_link = executeQuery(servicio);
+        const image_link_results = await executeQuery(servicio.toLowerCase());
+
+        if (image_link_results.length == 0) {
+            console.log("sin resultados");
+            return res.json({
+                markdown: "...",
+                type: "markdown",
+                desc: "No se encontraron imagenes para ese servicio, puedes revisar nuestras redes sociales @thebrowspotmx"
+            });
+        }
+
+        const image_link = image_link_results[0].link
+        console.log(`link de la imagen: ${image_link}`)
         //Send image to phone number
         await enviarMensajeWhatsApp(numero, image_link);
 
