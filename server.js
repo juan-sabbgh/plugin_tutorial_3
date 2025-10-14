@@ -275,7 +275,7 @@ async function enviarMensajeWhatsApp(number_receiver, image_link) {
         return res.json({
             markdown: "...",
             type: "markdown",
-            desc: "Ocurrió un error al enviar la imagen, intentalo de nuevo o puedes encontrar los resultados nuestras redes sociales @thebrowspotmx"
+            desc: "Ocurrió un error al enviar la imagen, intentalo de nuevo o puedes encontrar los resultados en nuestro Instagram @thebrowspotmx"
         });
     }
 }
