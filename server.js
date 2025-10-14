@@ -272,6 +272,11 @@ async function enviarMensajeWhatsApp(number_receiver, image_link) {
 
     } catch (error) {
         console.error('❌ Error en la petición:', error);
+        return res.json({
+            markdown: "...",
+            type: "markdown",
+            desc: "Ocurrió un error al enviar la imagen, intentalo de nuevo o puedes encontrar los resultados nuestras redes sociales @thebrowspotmx"
+        });
     }
 }
 
