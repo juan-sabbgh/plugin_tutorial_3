@@ -435,7 +435,7 @@ app.post('/api/return-image-browspot', async (req, res) => {
         return res.json({
             markdown: "...",
             type: "markdown",
-            desc: "No se encontraron imagenes para ese servicio, puedes revisar nuestras redes sociales @thebrowspotmx"
+            desc: "Ocurrió un error al enviar la imagen, intentalo de nuevo o puedes encontrar los resultados en nuestro Instagram @thebrowspotmx"
         });
     }
 
