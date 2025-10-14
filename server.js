@@ -14,6 +14,9 @@ const AGENT_TOKEN = process.env.AGENT_TOKEN;
 const AGENT_KEY = process.env.AGENT_KEY;
 const AS_ACCOUNT = process.env.AS_ACCOUNT;
 
+const AGENT_TOKEN_BS_IMG = process.env.AGENT_TOKEN_BS_IMG;
+const AGENT_KEY_BS_IMG = process.env.AGENT_KEY_BS_IMG;
+
 const YCLOUD_API = process.env.YCLOUD_API;
 
 //database parameters
@@ -101,6 +104,39 @@ async function getChatSummary(hair_data) {
                 'Content-Type': 'application/json',
                 'cybertron-robot-key': AGENT_KEY,
                 'cybertron-robot-token': AGENT_TOKEN
+            },
+            body: JSON.stringify(requestData)
+        });
+
+        if (!response.ok) {
+            throw new Error(`Error en la solicitud: ${response.status} ${response.statusText}`);
+        }
+
+        const data = await response.json();
+        return data.data.answer;
+
+    } catch (error) {
+        console.error('Error getting chat summary:', error);
+        throw error;
+    }
+}
+
+async function getImageName(service) {
+    try {
+        // Create a more informative prompt including the database results
+        const prompt = `Servicio: "${service}"`;
+
+        const requestData = {
+            username: AS_ACCOUNT,
+            question: prompt
+        };
+
+        const response = await fetch(url, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'cybertron-robot-key': AGENT_KEY_BS_IMG,
+                'cybertron-robot-token': AGENT_TOKEN_BS_IMG
             },
             body: JSON.stringify(requestData)
         });
@@ -353,8 +389,21 @@ app.post('/api/return-image-browspot', async (req, res) => {
     const numero = function_call_username.split('--').pop();
     console.log(`Se busca imagen para ${servicio} y se manda al numero: ${numero}`)
     try {
+
+        //Get the exact service name with another agent that will map the name to one of the services, if it isnt in the database then it will return 'null'
+        const image_name = await getImageName(servicio);
+        console.log(`Resultado del agente de nombre de imagen: ${servicio}`)
+        if (image_name == 'null'){
+            console.log("sin resultados");
+            return res.json({
+                markdown: "...",
+                type: "markdown",
+                desc: "No se encontraron imagenes para ese servicio, puedes revisar nuestras redes sociales @thebrowspotmx"
+            });
+        }
+
         //look for image link in database for that service
-        const image_link_results = await executeQuery(servicio.toLowerCase());
+        const image_link_results = await executeQuery(image_name.toLowerCase());
 
         if (image_link_results.length == 0) {
             console.log("sin resultados");
