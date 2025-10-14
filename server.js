@@ -392,7 +392,7 @@ app.post('/api/return-image-browspot', async (req, res) => {
 
         //Get the exact service name with another agent that will map the name to one of the services, if it isnt in the database then it will return 'null'
         const image_name = await getImageName(servicio);
-        console.log(`Resultado del agente de nombre de imagen: ${servicio}`)
+        console.log(`Resultado del agente de nombre de imagen: ${image_name}`)
         if (image_name == 'null'){
             console.log("sin resultados");
             return res.json({
