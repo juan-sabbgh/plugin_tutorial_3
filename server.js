@@ -403,7 +403,7 @@ app.post('/api/return-image-browspot', async (req, res) => {
             return res.json({
                 markdown: "...",
                 type: "markdown",
-                desc: "No se encontraron imagenes para ese servicio, puedes revisar nuestras redes sociales @thebrowspotmx"
+                desc: "No se encontraron imagenes para ese servicio, puedes revisar nuestras redes sociales @thebrowspotmx\n¿Te gustaria agendar una cita?"
             });
         }
 
@@ -415,7 +415,7 @@ app.post('/api/return-image-browspot', async (req, res) => {
             return res.json({
                 markdown: "...",
                 type: "markdown",
-                desc: "No se encontraron imagenes para ese servicio, puedes revisar nuestras redes sociales @thebrowspotmx"
+                desc: "No se encontraron imagenes para ese servicio, puedes revisar nuestras redes sociales @thebrowspotmx\n¿Te gustaria agendar una cita?"
             });
         }
 
@@ -428,14 +428,14 @@ app.post('/api/return-image-browspot', async (req, res) => {
         return res.json({
             markdown: "...",
             type: "markdown",
-            desc: `Asi es como quedan los resultados al aplicarte ${servicio}`
+            desc: `Asi es como quedan los resultados al aplicarte ${servicio}\n¿Te gustaria agendar una cita?`
         });
     } catch (error) {
         //Return error message as we couldnt find images for that service and to check the social media
         return res.json({
             markdown: "...",
             type: "markdown",
-            desc: "Ocurrió un error al enviar la imagen, intentalo de nuevo o puedes encontrar los resultados en nuestro Instagram @thebrowspotmx"
+            desc: "Ocurrió un error al enviar la imagen, intentalo de nuevo o puedes encontrar los resultados en nuestro Instagram @thebrowspotmx\n¿Te gustaria agendar una cita?"
         });
     }
 
