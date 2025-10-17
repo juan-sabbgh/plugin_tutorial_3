@@ -46,6 +46,7 @@ const pool = new Pool(dbConfig);
 async function executeQuery(servicio) {
     try {
         const searchTerm = `%${servicio}%`;
+        console.log(`Aqui se deberia ejecutar la query para buscar ${searchTerm}`)
         //get link for that service
         const results = await pool.query("SELECT link FROM iimages_browspot WHERE servicio ILIKE $1", [searchTerm]);
         console.log(results.rows);
